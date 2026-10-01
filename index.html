@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Shuffle Touch • Gemelo Digital (Three.js & Blender)</title>
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <!-- Mapa de Importación para Three.js y Addons (OrbitControls, GLTFLoader) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- Script de Pestañas Inmediato (funciona siempre) -->
+    <script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.currentTarget.getAttribute('data-tab');
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                const target = document.getElementById(targetId);
+                if (target) target.classList.add('active');
+            });
+        window.onGlbFileSelected = function(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (window.app && window.app.uiManager) {
+                    window.app.uiManager.handleBlenderFile(file);
+                } else {
+                    window._pendingGlbFile = file;
+                }
+            }
+        };
+    });
+    </script>
+</head>
+<body>
+
+    <!-- Contenedor 3D Three.js -->
+    <div id="canvasContainer"></div>
+
+    <!-- Barra de Navegación Superior -->
+    <header class="top-nav">
+        <div class="brand">
+            <span class="apple-icon"></span>
+            <div class="brand-text">
+                <h1>Apple Shuffle Touch</h1>
+                <span>Gemelo Digital • Fab Digital</span>
+            </div>
+        </div>
+
+        <!-- Selector de Ángulos de Cámara -->
+        <div class="camera-controls">
+            <button class="cam-btn active" data-camera-view="front">Pantalla (Frente)</button>
+            <button class="cam-btn" data-camera-view="perspective">Perspectiva 3D</button>
+            <button class="cam-btn" data-camera-view="back">Posterior (Clip)</button>
+            <button class="cam-btn" data-camera-view="exploded">Despiece</button>
+        </div>
+    </header>
+
+    <!-- Panel Izquierdo: Telemetría en Vivo (Rúbrica Punto 2) -->
+    <aside class="hud-panel left-panel">
+        <div class="panel-header">
+            <h2>Telemetría del Gemelo</h2>
+            <span id="valPowerState" class="badge badge-red">OFF</span>
+        </div>
+
+        <!-- Batería y Energía -->
+        <div class="telemetry-item">
+            <div class="telemetry-row">
+                <span class="telemetry-label">Batería Litio-Ion</span>
+                <span id="valBatteryLevel" class="telemetry-val">84% (3.82V)</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="barBattery" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <!-- Métricas Físicas del Chip -->
+        <div class="grid-2col">
+            <div class="stat-box">
+                <span class="stat-title">Temperatura SoC</span>
+                <span id="valTemperature" class="stat-number">27.4 °C</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-title">Carga CPU</span>
+                <span id="valCpuLoad" class="stat-number">8%</span>
+            </div>
+        </div>
+
+        <!-- Audio y Procesamiento -->
+        <div class="telemetry-item">
+            <div class="telemetry-row">
+                <span class="telemetry-label">Procesador DAC Audio</span>
+                <span id="valAudioStatus" class="status-idle">En espera</span>
+            </div>
+            <div class="telemetry-row">
+                <span class="telemetry-label">Pista</span>
+                <span id="valCurrentTrack" class="telemetry-val" style="font-size: 11px; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Starboy - The Weeknd</span>
+            </div>
+        </div>
+
+        <!-- Conexiones Físicas -->
+        <div class="telemetry-item">
+            <div class="telemetry-row">
+                <span class="telemetry-label">Puerto Jack 3.5mm</span>
+                <span id="valHeadphones" class="telemetry-val" style="color: var(--text-muted);">Desconectado</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Indicador de Guía Central Flotante -->
+    <div class="hint-pill">
+        💡 Mantén presionado el botón más de 3s para encender/apagar • Desliza arriba para Menú de Apps • Desliza ◄ ► para cambiar de app
+    </div>
+
+    <!-- Panel Derecho: Pestañas de Control, Lógica de la Rúbrica y Carga Blender -->
+    <aside class="hud-panel right-panel">
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="tabBlender">Cargar Blender</button>
+            <button class="tab-btn" data-tab="tabSimulador">Simulador</button>
+            <button class="tab-btn" data-tab="tabLogica">Lógica (Rúbrica)</button>
+        </div>
+
+        <!-- Pestaña 1: Cargar Modelo de Blender (.GLB / .GLTF) - ACTIVA POR DEFECTO -->
+        <div id="tabBlender" class="tab-content active">
+            <label for="fileInputGlb" class="drop-zone" id="dropZone">
+                <span class="drop-icon">📦</span>
+                <span class="drop-text">Arrastra tu archivo .glb de Blender</span>
+                <span class="drop-sub">o haz clic aquí para buscarlo</span>
+                <input type="file" id="fileInputGlb" accept=".glb,.gltf" style="display: none;" onchange="onGlbFileSelected(this)">
+            </label>
+
+            <button type="button" class="action-btn" style="background: var(--apple-blue); border: none; font-weight: 600;" onclick="document.getElementById('fileInputGlb').click()">
+                📂 Seleccionar Archivo .GLB
+            </button>
+
+            <div id="meshSelectorContainer" style="display: none; margin-top: 10px;">
+                <label style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: block;">
+                    Seleccionar Malla que actúa como Pantalla:
+                </label>
+                <select id="selectScreenMesh" class="select-dropdown"></select>
+            </div>
+
+            <div class="flow-card" style="font-size: 11px; line-height: 1.5;">
+                <strong style="color: var(--apple-green); display: block; margin-bottom: 4px;">Consejo para exportar desde Blender:</strong>
+                1. Nombra la pantalla <code>Screen</code> o <code>Pantalla</code> para detección automática.<br>
+                2. Asegúrate de presionar <code>Ctrl + A ➔ Apply All Transforms</code> en Blender.<br>
+                3. Ve a <code>File ➔ Export ➔ glTF 2.0 (.glb)</code> y cárgalo aquí.
+            </div>
+        </div>
+
+        <!-- Pestaña 2: Simulador y Pruebas -->
+        <div id="tabSimulador" class="tab-content">
+            <button id="btnTogglePower" class="action-btn">
+                ⚡ Encender / Apagar (> 3s)
+            </button>
+
+            <!-- Gestos Táctiles estilo Apple Watch / iPhone -->
+            <div style="margin-top: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                Gestos Táctiles (watchOS)
+            </div>
+            <button id="btnSwipeUp" class="action-btn" style="background: rgba(10, 132, 255, 0.2); border: 1px solid var(--apple-blue); color: #ffffff;">
+                ▲ Swipe Arriba (Menú de Apps)
+            </button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <button id="btnSwipeLeft" class="action-btn" style="margin: 0;">
+                    ◄ Swipe Izquierda
+                </button>
+                <button id="btnSwipeRight" class="action-btn" style="margin: 0;">
+                    ► Swipe Derecha
+                </button>
+            </div>
+
+            <button id="btnToggleCharging" class="action-btn">
+                ⚡ Conectar Cargador
+            </button>
+
+            <button id="btnToggleHeadphones" class="action-btn">
+                🎧 Conectar Auriculares (3.5mm)
+            </button>
+
+            <!-- Slider Despiece Digital (Rúbrica Punto 1: Jerarquía de Partes) -->
+            <div class="slider-container" style="margin-top: 8px;">
+                <div class="slider-labels">
+                    <span>Despiece Digital (Exploded View)</span>
+                    <span id="valExploded" style="color: var(--apple-blue); font-weight: 600;">0%</span>
+                </div>
+                <input id="sliderExploded" type="range" min="0" max="1" step="0.01" value="0">
+                <span style="font-size: 10px; color: var(--text-muted);">Separa chasis, pantalla OLED, vidrio protector, PCB, batería y clip.</span>
+            </div>
+        </div>
+
+        <!-- Pestaña 3: Lógica y Estados (Rúbrica Puntos 2, 3 y 5) -->
+        <div id="tabLogica" class="tab-content">
+            <div class="flow-card">
+                <div class="flow-step">
+                    <div class="flow-num">1</div>
+                    <div class="flow-text">
+                        <strong>Entrada (Input)</strong>
+                        <p>Toque en pantalla 3D (coordenadas UV por Raycasting) o botones físicos.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-num">2</div>
+                    <div class="flow-text">
+                        <strong>Interpretación</strong>
+                        <p>El sistema evalúa el estado actual (si está en reposo OFF, despierta el núcleo).</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-num">3</div>
+                    <div class="flow-text">
+                        <strong>Decisión y Estado</strong>
+                        <p>Transición de estado: OFF ➔ BOOTING (animación logo Apple) ➔ ON (interfaz iOS).</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-num">4</div>
+                    <div class="flow-text">
+                        <strong>Respuesta Fisiológica</strong>
+                        <p>Emisión OLED activa, cálculo de drenaje de batería dinámico, sonido háptico Web Audio.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-card" style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                <strong style="color: var(--apple-blue); font-size: 12px; margin-bottom: 6px; display: block;">¿Qué dato gobierna qué comportamiento?</strong>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div><span style="color: var(--apple-blue); font-weight: bold;">•</span> <code>powerState</code>: gobierna encendido de pantalla y shaders emisivos.</div>
+                    <div><span style="color: var(--apple-yellow); font-weight: bold;">•</span> <code>battery.level</code>: gobierna la autonomía y apagado forzado.</div>
+                    <div><span style="color: var(--apple-green); font-weight: bold;">•</span> <code>isCharging</code>: eleva voltaje e incrementa temperatura interna.</div>
+                    <div><span style="color: var(--apple-purple); font-weight: bold;">•</span> <code>audio.isPlaying</code>: acelera descarga e incrementa carga CPU.</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Consola Inferior: Registro de Decisiones y Eventos del Gemelo Digital -->
+    <footer class="bottom-console">
+        <div class="console-header">
+            <span>Consola de Lógica del Gemelo Digital (Entrada ➔ Interpretación ➔ Decisión ➔ Respuesta)</span>
+            <span style="color: var(--apple-blue);">Live Stream</span>
+        </div>
+        <div id="consoleLogs" class="console-logs"></div>
+    </footer>
+
+    <!-- Script Principal Modular (ESM) -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html>

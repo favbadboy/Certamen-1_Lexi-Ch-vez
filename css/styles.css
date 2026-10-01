@@ -1,0 +1,588 @@
+/* Estilos Globales - Apple Dark Glassmorphic Design */
+:root {
+    --bg-dark: #0c0d12;
+    --panel-bg: rgba(22, 24, 34, 0.72);
+    --panel-border: rgba(255, 255, 255, 0.12);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.65);
+    --text-muted: rgba(255, 255, 255, 0.4);
+    --apple-blue: #0a84ff;
+    --apple-green: #34c759;
+    --apple-yellow: #b45309; /* Ámbar oscuro de alto contraste para legibilidad de texto blanco */
+    --apple-red: #ff453a;
+    --apple-purple: #bf5af2;
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-dark);
+    font-family: var(--font-stack);
+    color: var(--text-primary);
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+#canvasContainer {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* Header / Barra Superior */
+.top-nav {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    right: 24px;
+    height: 56px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--panel-border);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 10;
+    box-shadow: var(--panel-shadow);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.apple-icon {
+    font-size: 22px;
+}
+
+.brand-text h1 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
+
+.brand-text span {
+    font-size: 11px;
+    color: var(--apple-blue);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.camera-controls {
+    display: flex;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 18px;
+    padding: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cam-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cam-btn:hover {
+    color: var(--text-primary);
+}
+
+.cam-btn.active {
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Paneles Flotantes (HUD) */
+.hud-panel {
+    position: absolute;
+    background: var(--panel-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    box-shadow: var(--panel-shadow);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Panel Izquierdo: Telemetría */
+.left-panel {
+    top: 92px;
+    left: 24px;
+    width: 310px;
+    padding: 20px;
+    gap: 16px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 10px;
+}
+
+.panel-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--text-primary);
+}
+
+.badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+.badge-green {
+    background: rgba(52, 199, 89, 0.2);
+    color: var(--apple-green);
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.badge-yellow {
+    background: rgba(255, 214, 10, 0.2);
+    color: var(--apple-yellow);
+    border: 1px solid rgba(255, 214, 10, 0.3);
+}
+
+.badge-red {
+    background: rgba(255, 69, 58, 0.2);
+    color: var(--apple-red);
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+.telemetry-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.telemetry-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.telemetry-label {
+    color: var(--text-secondary);
+}
+
+.telemetry-val {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 84%;
+    background: var(--apple-blue);
+    border-radius: 3px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.stat-box {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-title {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.stat-number {
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.status-active {
+    color: var(--apple-green);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-idle {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* Panel Derecho: Controles e Integración */
+.right-panel {
+    top: 92px;
+    right: 24px;
+    width: 360px;
+    max-height: calc(100vh - 240px);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs-header {
+    display: flex;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 16px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.tab-btn.active {
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--text-primary);
+}
+
+.tab-content {
+    display: none;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Scrollbar estilizada */
+.tab-content::-webkit-scrollbar {
+    width: 4px;
+}
+.tab-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+/* Controles de Simulación */
+.action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.action-btn.active {
+    background: rgba(52, 199, 89, 0.25);
+    border-color: var(--apple-green);
+    color: var(--apple-green);
+}
+
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Diagrama de Lógica del Gemelo (Rúbrica) */
+.flow-card {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.flow-num {
+    background: var(--apple-blue);
+    color: white;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.flow-text strong {
+    color: var(--text-primary);
+}
+
+.flow-text p {
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+/* Importar Blender */
+.drop-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.drop-zone:hover {
+    border-color: var(--apple-blue);
+    background: rgba(10, 132, 255, 0.08);
+}
+
+.drop-icon {
+    font-size: 32px;
+}
+
+.drop-text {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.drop-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.select-dropdown {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    outline: none;
+}
+
+/* Consola Inferior de Eventos */
+.bottom-console {
+    position: absolute;
+    bottom: 20px;
+    left: 24px;
+    right: 24px;
+    height: 110px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    box-shadow: var(--panel-shadow);
+    z-index: 10;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.console-logs {
+    flex: 1;
+    overflow-y: auto;
+    font-family: "SF Mono", Menlo, Consolas, Monaco, monospace;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 6px;
+}
+
+.log-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.log-time {
+    color: var(--text-muted);
+}
+
+.log-tag {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.tag-input {
+    background: rgba(10, 132, 255, 0.25);
+    color: var(--apple-blue);
+}
+
+.tag-state {
+    background: rgba(191, 90, 242, 0.25);
+    color: var(--apple-purple);
+}
+
+.tag-decision {
+    background: #78350f;
+    color: #ffffff;
+    border: 1px solid #b45309;
+}
+
+.tag-alert {
+    background: rgba(255, 69, 58, 0.25);
+    color: var(--apple-red);
+}
+
+.tag-info {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+}
+
+.log-msg {
+    color: var(--text-primary);
+}
+
+.log-detail {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Indicador de ayuda al usuario en pantalla táctil 3D */
+.hint-pill {
+    position: absolute;
+    bottom: 145px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 20px;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    animation: pulseHint 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseHint {
+    0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.03); }
+}
+
+@media (max-width: 900px) {
+    .left-panel { display: none; }
+    .right-panel { width: 300px; right: 10px; }
+}
